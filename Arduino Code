@@ -1,0 +1,98 @@
+//let's say you want to read up to 100 values
+const unsigned int numReadings = 20;
+//unsigned int analogValsx[numReadings];
+//unsigned int analogValsy[numReadings];
+//unsigned int analogValsz[numReadings];
+//
+int analogValsx[numReadings]={10,15,20,25,30,35,40,45,50,55,11,15,19,23,27,31,35,39,43,47};
+//int analogValsx[numReadings]={11,15,19,23,27,31,35,30,26,22,18,14,10,6,2,90,86,82,78,74};
+int analogValsy[numReadings]={11,15,19,23,27,31,35,30,26,22,18,14,10,6,2,90,86,82,78,74};
+int analogValsz[numReadings]={18,14,10,6,2,90,86,82,78,74,55,60,65,70,75,80,85,90,95,100};
+
+
+void setup()
+{
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  //take numReadings # of readings and store into array
+//  for (unsigned int i=0; i<numReadings; i++)
+//  {
+//    analogValsx[i] = analogRead(A0);
+//    delay(10); //wait 10 msec
+//
+//        analogValsy[i] = analogRead(A1);
+//    delay(10); //wait 10 msec
+//
+//        analogValsz[i] = analogRead(A2);
+//    delay(10); //wait 10 msec
+//  }
+
+delta_encode(analogValsx, numReadings);
+compressRLE(analogValsx);
+
+delta_encode(analogValsy, numReadings);
+compressRLE(analogValsy);
+
+delta_encode(analogValsz, numReadings);
+compressRLE(analogValsz);
+
+
+  Serial.println("Delta comp");
+
+ for (unsigned int i=0; i<numReadings; i++)
+{
+
+Serial.print(analogValsx[i]);
+Serial.print("\t");
+
+delay(10);
+Serial.print(analogValsy[i]);
+delay(10);
+Serial.print("\t");
+
+Serial.println(analogValsz[i]);
+
+}
+}
+
+void delta_encode(signed int * buffer, int length)
+{
+
+   signed int last = 0;
+
+  for (int i = 0; i < length; i++)
+  {
+      //signed char current = buffer[2*i];
+      //signed char currentcom = buffer[2*i+1];
+            signed int current = buffer[i];
+      //signed int currentcom = buffer[2*i+1];
+      buffer[i] = current - last;
+      //buffer[2*i+1] = currentcom - lastcom;
+      last = current;
+      //lastcom=currentcom;
+  }
+}
+
+void compressRLE(int string[])
+{
+    int n=numReadings ;
+    Serial.print("RLE Compression \n");
+   for (int i = 0; i < n; i++)
+{
+
+    // Count occurrences of current character
+    int count = 1;
+    while (i < n - 1 && string[i] == string[i + 1])
+    {
+        count++;
+        i++;
+    }
+        Serial.print(string[i]);
+        Serial.print(count);
+        
+}
+    
+}
